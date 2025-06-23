@@ -20,7 +20,7 @@ import { PanelProps } from '@perses-dev/plugin-system';
 import { FlameChartOptions } from '../flame-chart-model';
 import { FlameChart } from './FlameChart';
 import { Settings } from './Settings';
-import { Table } from './Table';
+import { TableChart } from './TableChart';
 
 export type FlameChartPanelProps = PanelProps<FlameChartOptions, ProfileData>;
 
@@ -134,7 +134,7 @@ export const FlameChartPanel: FC<FlameChartPanelProps> = (props) => {
           )}
           <Stack direction="row" justifyContent="center" alignItems="top">
             {liveSpec.showTable && (
-              <Table
+              <TableChart
                 width={liveSpec.showFlameGraph ? (1 / 3) * contentDimensions.width : contentDimensions.width}
                 height={contentDimensions.height - OPTIONS_SPACE}
                 data={flameChartData.data}

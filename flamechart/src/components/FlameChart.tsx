@@ -27,6 +27,7 @@ import ContentCopyIcon from 'mdi-material-ui/ContentCopy';
 import { EChartsCoreOption } from 'echarts/core';
 import { recursionJson, changeColors, findTotalSampleByName } from '../utils/data-transform';
 import { generateTooltip } from '../utils/tooltip';
+import { Sample } from '../utils/data-model';
 import { CustumBreadcrumb } from './CustumBreadcrumb';
 
 const ITEM_GAP = 2; // vertical gap between flame chart items
@@ -43,24 +44,6 @@ export interface FlameChartProps {
   palette: 'package-name' | 'value';
   resetGraph: boolean;
   changeResetGraph: (newVal: boolean) => void;
-}
-
-export interface Sample {
-  name: number;
-  value: [
-    level: number,
-    start_val: number,
-    end_val: number,
-    name: string,
-    total_percentage: number,
-    self_percentage: number,
-    shortName: string,
-    self: number,
-    total: number,
-  ];
-  itemStyle: {
-    color: string;
-  };
 }
 
 export function FlameChart(props: FlameChartProps): ReactElement {
