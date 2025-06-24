@@ -12,12 +12,12 @@
 // limitations under the License.
 
 import { ReactElement, useMemo, useState } from 'react';
-import { Stack } from '@mui/material';
+import { Stack, useTheme } from '@mui/material';
 import { ProfileData } from '@perses-dev/core';
 import { Table, TableColumnConfig } from '@perses-dev/components';
 import { PaginationState, SortingState } from '@tanstack/react-table';
-import { recursionJson } from '../utils/data-transform';
-import { Sample } from '../utils/data-model';
+import { tableRecursionJson } from '../utils/data-transform';
+import { TableChartSample } from '../utils/data-model';
 import { ColumnSettings } from '../utils/table-model';
 import { formatItemValue } from '../utils/format';
 
@@ -38,9 +38,9 @@ function generateCellContentConfig(
     cell: (ctx) => {
       const cellValue = ctx.getValue();
       // Name column is a string, not a number and doesn't need to be formated
-      return column.name === 'Name' ? cellValue : formatItemValue(unit, cellValue);
+      return column.name === 'name' ? cellValue : formatItemValue(unit, cellValue);
     },
-    cellDescription: column.cellDescription ? (): string => `${column.cellDescription}` : undefined,
+    cellDescription: () => '',
   };
 }
 
@@ -76,14 +76,13 @@ function generateColumnConfig(
 export function TableChart(props: TableChartProps): ReactElement {
   const { width, height, data } = props;
 
+  const theme = useTheme();
+
   const availableHeight = height - 10;
   const availableWidth = width - 10;
 
-  const rawData: Array<Record<string, unknown>> = useMemo(() => {
-    // Transform query results to a tabular format
-    // We can use the default palette (package-name) for the table because we are not using colors in the table
-    const samples: Sample[] = recursionJson('package-name', data.metadata, data.profile.stackTrace);
-    return samples.map((sample) => ({ Name: sample.value[6], Self: sample.value[7], Total: sample.value[8] }));
+  const rawData: TableChartSample[] = useMemo(() => {
+    return tableRecursionJson(data.profile.stackTrace);
   }, [data]);
 
   const columns: Array<TableColumnConfig<unknown>> = useMemo(() => {
@@ -91,7 +90,7 @@ export function TableChart(props: TableChartProps): ReactElement {
 
     const columnSettings: ColumnSettings[] = [
       {
-        name: 'Name',
+        name: 'name',
         header: 'Name',
         headerDescription: 'Function name',
         align: 'left',
@@ -99,17 +98,17 @@ export function TableChart(props: TableChartProps): ReactElement {
         width: (1 / 2) * availableWidth,
       },
       {
-        name: 'Self',
+        name: 'self',
         header: 'Self',
-        headerDescription: 'Function self samples (excluding his children samples)',
+        headerDescription: 'Function self samples',
         align: 'right',
         enableSorting: true,
         width: (1 / 4) * availableWidth,
       },
       {
-        name: 'Total',
+        name: 'total',
         header: 'Total',
-        headerDescription: 'Function total samples (including his children samples)',
+        headerDescription: 'Function total samples',
         align: 'right',
         enableSorting: true,
         width: (1 / 4) * availableWidth,
@@ -118,13 +117,13 @@ export function TableChart(props: TableChartProps): ReactElement {
 
     const unit = data.metadata?.units || '';
 
-    const nameColumn = generateColumnConfig('Name', columnSettings, unit);
+    const nameColumn = generateColumnConfig('name', columnSettings, unit);
     columns.push(nameColumn);
 
-    const selfColumn = generateColumnConfig('Self', columnSettings, unit);
+    const selfColumn = generateColumnConfig('self', columnSettings, unit);
     columns.push(selfColumn);
 
-    const totalColumn = generateColumnConfig('Total', columnSettings, unit);
+    const totalColumn = generateColumnConfig('total', columnSettings, unit);
     columns.push(totalColumn);
 
     return columns;
@@ -138,7 +137,23 @@ export function TableChart(props: TableChartProps): ReactElement {
   });
 
   return (
-    <Stack width={availableWidth} height={availableHeight} sx={{ paddingTop: `${PADDING_TOP}px` }}>
+    <Stack
+      width={availableWidth}
+      height={availableHeight}
+      sx={{
+        paddingTop: `${PADDING_TOP}px`,
+        '& .MuiTable-root': {
+          borderCollapse: 'collapse',
+        },
+        '& .MuiTableCell-root': {
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          borderRight: `1px solid ${theme.palette.divider}`,
+          '&:last-child': {
+            borderRight: 'none',
+          },
+        },
+      }}
+    >
       <Table
         data={rawData}
         columns={columns}
