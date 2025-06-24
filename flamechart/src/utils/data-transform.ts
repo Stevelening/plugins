@@ -149,16 +149,25 @@ export function tableRecursionJson(jsonObj: StackTrace): TableChartSample[] {
 
 /**
  * Update only series data colors to align with the new palette.
+ * If tableCellId is defined, convert all series data colors to gray exept the one with specified ID
  */
-export function changeColors(palette: string, seriesData: Sample[]): Sample[] {
-  return seriesData.map((item) => ({
-    ...item,
-    itemStyle: {
-      // values[6] = function name
-      // values[4] = total percentage
-      color: getSpanColor(palette, item.value[6], item.value[4]),
-    },
-  }));
+export function changeColors(palette: string, seriesData: Sample[], tableCellId: number): Sample[] {
+  // values[6] = function name
+  // values[4] = total percentage
+  if (tableCellId)
+    return seriesData.map((item) => ({
+      ...item,
+      itemStyle: {
+        color: item.name === tableCellId ? getSpanColor(palette, item.value[6], item.value[4]) : '#dee2e6',
+      },
+    }));
+  else
+    return seriesData.map((item) => ({
+      ...item,
+      itemStyle: {
+        color: getSpanColor(palette, item.value[6], item.value[4]),
+      },
+    }));
 }
 
 /**

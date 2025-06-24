@@ -36,6 +36,7 @@ export const FlameChartPanel: FC<FlameChartPanelProps> = (props) => {
   }, [spec]);
 
   const [resetGraph, setResetGraph] = useState(false);
+  const [tableCellId, setTableCellId] = useState(0);
 
   const chartsTheme = useChartsTheme();
   const flameChartData = queryResults[0];
@@ -104,6 +105,14 @@ export const FlameChartPanel: FC<FlameChartPanelProps> = (props) => {
     setResetGraph(newVal);
   };
 
+  const handleTableCellFocus = (id: number) => {
+    setTableCellId(id);
+  };
+
+  const handleTalbeCellBlur = () => {
+    setTableCellId(0);
+  };
+
   const OPTIONS_SPACE = liveSpec.showSettings ? 35 : 0; // space for options at the top of the chart
 
   return (
@@ -133,23 +142,24 @@ export const FlameChartPanel: FC<FlameChartPanelProps> = (props) => {
             />
           )}
           <Stack direction="row" justifyContent="center" alignItems="top">
-            {liveSpec.showTable && (
-              <TableChart
-                width={liveSpec.showFlameGraph ? (2 / 5) * contentDimensions.width : contentDimensions.width}
-                height={contentDimensions.height - OPTIONS_SPACE}
-                data={flameChartData.data}
-              />
-            )}
-            {liveSpec.showFlameGraph && (
-              <FlameChart
-                width={liveSpec.showTable ? (3 / 5) * contentDimensions.width : contentDimensions.width}
-                height={contentDimensions.height - OPTIONS_SPACE}
-                data={flameChartData.data}
-                palette={liveSpec.palette}
-                resetGraph={resetGraph}
-                changeResetGraph={changeResetGraph}
-              />
-            )}
+            <TableChart
+              width={liveSpec.showFlameGraph ? (2 / 5) * contentDimensions.width : contentDimensions.width}
+              height={contentDimensions.height - OPTIONS_SPACE}
+              data={flameChartData.data}
+              onFocus={handleTableCellFocus}
+              onBlur={handleTalbeCellBlur}
+              display={liveSpec.showTable}
+            />
+            <FlameChart
+              width={liveSpec.showTable ? (3 / 5) * contentDimensions.width : contentDimensions.width}
+              height={contentDimensions.height - OPTIONS_SPACE}
+              data={flameChartData.data}
+              palette={liveSpec.palette}
+              resetGraph={resetGraph}
+              changeResetGraph={changeResetGraph}
+              tableCellId={tableCellId}
+              display={liveSpec.showFlameGraph}
+            />
           </Stack>
         </Stack>
       ) : (

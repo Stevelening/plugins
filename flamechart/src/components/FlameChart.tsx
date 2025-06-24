@@ -43,11 +43,13 @@ export interface FlameChartProps {
   data: ProfileData;
   palette: 'package-name' | 'value';
   resetGraph: boolean;
+  tableCellId: number;
+  display: boolean;
   changeResetGraph: (newVal: boolean) => void;
 }
 
 export function FlameChart(props: FlameChartProps): ReactElement {
-  const { width, height, data, palette, resetGraph, changeResetGraph } = props;
+  const { width, height, data, palette, resetGraph, tableCellId, display, changeResetGraph } = props;
   const theme = useTheme();
   const chartsTheme = useChartsTheme();
   const [menuPosition, setMenuPosition] = useState<{ mouseX: number; mouseY: number } | null>(null);
@@ -62,6 +64,7 @@ export function FlameChart(props: FlameChartProps): ReactElement {
   const paletteRef = useRef(palette);
   const dataRef = useRef(data);
   const resetGraphRef = useRef(resetGraph);
+  const tableCellIdRef = useRef(tableCellId);
 
   const handleItemClick = (params: MouseEventsParameters<Sample>): void => {
     const data: Sample = params.data;
@@ -82,7 +85,9 @@ export function FlameChart(props: FlameChartProps): ReactElement {
 
   const handleFocusBlock = (): void => {
     if (selectedId) {
-      setSeriesData(recursionJson(palette, data.metadata, data.profile.stackTrace, selectedId));
+      let newSeriesData = recursionJson(palette, data.metadata, data.profile.stackTrace, selectedId);
+      if (tableCellId) newSeriesData = changeColors(palette, newSeriesData, tableCellId);
+      setSeriesData(newSeriesData);
       setIsBlockFocused(true);
     }
     handleClose();
@@ -162,7 +167,7 @@ export function FlameChart(props: FlameChartProps): ReactElement {
   // update seriesData with the latest data
   useMemo(() => {
     if (paletteRef.current !== palette) {
-      setSeriesData(changeColors(palette, seriesData));
+      setSeriesData(changeColors(palette, seriesData, tableCellId));
       paletteRef.current = palette;
     } else if (dataRef.current !== data) {
       setSeriesData(recursionJson(palette, data.metadata, data.profile.stackTrace));
@@ -170,12 +175,18 @@ export function FlameChart(props: FlameChartProps): ReactElement {
       setIsBlockFocused(false);
     } else if (resetGraphRef.current !== resetGraph) {
       if (!resetGraph) {
-        setSeriesData(recursionJson(palette, data.metadata, data.profile.stackTrace));
+        let newSeriesData = recursionJson(palette, data.metadata, data.profile.stackTrace);
+        if (tableCellId) newSeriesData = changeColors(palette, newSeriesData, tableCellId);
+
+        setSeriesData(newSeriesData);
         setIsBlockFocused(false);
       }
       resetGraphRef.current = resetGraph;
+    } else if (tableCellIdRef.current !== tableCellId) {
+      setSeriesData(changeColors(palette, seriesData, tableCellId));
+      tableCellIdRef.current = tableCellId;
     }
-  }, [data, palette, resetGraph, seriesData]);
+  }, [data, palette, resetGraph, seriesData, tableCellId]);
 
   const option: EChartsCoreOption = useMemo(() => {
     if (data.profile.stackTrace === undefined) return chartsTheme.noDataOption;
@@ -265,6 +276,7 @@ export function FlameChart(props: FlameChartProps): ReactElement {
 
   return (
     <Stack
+      display={display ? 'flex' : 'none'}
       style={{
         width: width,
         height: height,

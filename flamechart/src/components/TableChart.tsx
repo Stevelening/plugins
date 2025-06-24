@@ -12,7 +12,7 @@
 // limitations under the License.
 
 import { ReactElement, useMemo, useState } from 'react';
-import { Stack, useTheme } from '@mui/material';
+import { Stack, useTheme, Link } from '@mui/material';
 import { ProfileData } from '@perses-dev/core';
 import { Table, TableColumnConfig } from '@perses-dev/components';
 import { PaginationState, SortingState } from '@tanstack/react-table';
@@ -28,62 +28,25 @@ export interface TableChartProps {
   width: number;
   height: number;
   data: ProfileData;
-}
-
-function generateCellContentConfig(
-  column: ColumnSettings,
-  unit: string
-): Pick<TableColumnConfig<unknown>, 'cellDescription' | 'cell'> {
-  return {
-    cell: (ctx) => {
-      const cellValue = ctx.getValue();
-      // Name column is a string, not a number and doesn't need to be formated
-      return column.name === 'name' ? cellValue : formatItemValue(unit, cellValue);
-    },
-    cellDescription: () => '',
-  };
-}
-
-/*
- * Generate column config
- * If column do not have a definition, return a default column config.
- */
-function generateColumnConfig(
-  name: string,
-  columnSettings: ColumnSettings[],
-  unit: string
-): TableColumnConfig<unknown> {
-  for (const column of columnSettings) {
-    if (column.name === name) {
-      return {
-        accessorKey: name,
-        header: column.header ?? name,
-        headerDescription: column.headerDescription,
-        enableSorting: column.enableSorting,
-        width: column.width,
-        align: column.align,
-        ...generateCellContentConfig(column, unit),
-      };
-    }
-  }
-
-  return {
-    accessorKey: name,
-    header: name,
-  };
+  display: boolean;
+  onFocus: (id: number) => void;
+  onBlur: () => void;
 }
 
 export function TableChart(props: TableChartProps): ReactElement {
-  const { width, height, data } = props;
+  const { width, height, data, display, onFocus } = props;
 
   const theme = useTheme();
+
+  const [filter, setFilter] = useState('');
 
   const availableHeight = height - 10;
   const availableWidth = width - 10;
 
-  const rawData: TableChartSample[] = useMemo(() => {
-    return tableRecursionJson(data.profile.stackTrace);
-  }, [data]);
+  const tableData: TableChartSample[] = useMemo(() => {
+    const tableData = tableRecursionJson(data.profile.stackTrace);
+    return filter ? tableData.filter((item) => item.name.toLowerCase().includes(filter.toLowerCase())) : tableData;
+  }, [data, filter]);
 
   const columns: Array<TableColumnConfig<unknown>> = useMemo(() => {
     const columns: Array<TableColumnConfig<unknown>> = [];
@@ -115,6 +78,64 @@ export function TableChart(props: TableChartProps): ReactElement {
       },
     ];
 
+    const generateCellContentConfig = (
+      column: ColumnSettings,
+      unit: string
+    ): Pick<TableColumnConfig<unknown>, 'cellDescription' | 'cell'> => {
+      return {
+        cell: (ctx) => {
+          const cellValue = ctx.getValue();
+          // Add clickable link for name column
+          if (column.name === 'name') {
+            return (
+              <Link
+                href="#"
+                underline="hover"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const currentSample = ctx.row.original as TableChartSample;
+                  onFocus(currentSample.id);
+                  setFilter(currentSample.name);
+                }}
+              >
+                {cellValue}
+              </Link>
+            );
+          }
+
+          return formatItemValue(unit, cellValue);
+        },
+        cellDescription: () => '',
+      };
+    };
+
+    // Generate column config
+    // If column do not have a definition, return a default column config.
+    const generateColumnConfig = (
+      name: string,
+      columnSettings: ColumnSettings[],
+      unit: string
+    ): TableColumnConfig<unknown> => {
+      for (const column of columnSettings) {
+        if (column.name === name) {
+          return {
+            accessorKey: name,
+            header: column.header ?? name,
+            headerDescription: column.headerDescription,
+            enableSorting: column.enableSorting,
+            width: column.width,
+            align: column.align,
+            ...generateCellContentConfig(column, unit),
+          };
+        }
+      }
+
+      return {
+        accessorKey: name,
+        header: name,
+      };
+    };
+
     const unit = data.metadata?.units || '';
 
     const nameColumn = generateColumnConfig('name', columnSettings, unit);
@@ -127,7 +148,7 @@ export function TableChart(props: TableChartProps): ReactElement {
     columns.push(totalColumn);
 
     return columns;
-  }, [data.metadata?.units, availableWidth]);
+  }, [data.metadata?.units, availableWidth, onFocus]);
 
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -140,6 +161,7 @@ export function TableChart(props: TableChartProps): ReactElement {
     <Stack
       width={availableWidth}
       height={availableHeight}
+      display={display ? 'flex' : 'none'}
       sx={{
         paddingTop: `${PADDING_TOP}px`,
         '& .MuiTable-root': {
@@ -155,7 +177,7 @@ export function TableChart(props: TableChartProps): ReactElement {
       }}
     >
       <Table
-        data={rawData}
+        data={tableData}
         columns={columns}
         height={availableHeight - PADDING_TOP}
         width={availableWidth}
