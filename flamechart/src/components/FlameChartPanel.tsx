@@ -135,14 +135,14 @@ export const FlameChartPanel: FC<FlameChartPanelProps> = (props) => {
           <Stack direction="row" justifyContent="center" alignItems="top">
             {liveSpec.showTable && (
               <TableChart
-                width={liveSpec.showFlameGraph ? (1 / 3) * contentDimensions.width : contentDimensions.width}
+                width={liveSpec.showFlameGraph ? (2 / 5) * contentDimensions.width : contentDimensions.width}
                 height={contentDimensions.height - OPTIONS_SPACE}
                 data={flameChartData.data}
               />
             )}
             {liveSpec.showFlameGraph && (
               <FlameChart
-                width={liveSpec.showTable ? (2 / 3) * contentDimensions.width : contentDimensions.width}
+                width={liveSpec.showTable ? (3 / 5) * contentDimensions.width : contentDimensions.width}
                 height={contentDimensions.height - OPTIONS_SPACE}
                 data={flameChartData.data}
                 palette={liveSpec.palette}
