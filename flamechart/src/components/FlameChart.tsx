@@ -27,7 +27,7 @@ import ContentCopyIcon from 'mdi-material-ui/ContentCopy';
 import { EChartsCoreOption } from 'echarts/core';
 import { recursionJson, changeColors, findTotalSampleByName } from '../utils/data-transform';
 import { generateTooltip } from '../utils/tooltip';
-import { Sample } from '../utils/data-model';
+import { FlameChartSample as Sample } from '../utils/data-model';
 import { CustumBreadcrumb } from './CustumBreadcrumb';
 
 const ITEM_GAP = 2; // vertical gap between flame chart items
