@@ -12,7 +12,7 @@
 // limitations under the License.
 
 import { ProfileMetaData, StackTrace } from '@perses-dev/core';
-import { Sample } from '../components/FlameChart';
+import { FlameChartSample as Sample, TableChartSample } from './data-model';
 import { getSpanColor } from './palette-gen';
 import { formatItemValue } from './format';
 
@@ -118,6 +118,32 @@ export function recursionJson(
 
   // check is filteredJson is not empty before call recur
   if (filteredJson.id) recur(filteredJson);
+  return data;
+}
+
+/**
+ * Transform query results to a tabular format for the table chart
+ */
+export function tableRecursionJson(jsonObj: StackTrace): TableChartSample[] {
+  const data: TableChartSample[] = [];
+  const structuredJson = structuredClone(jsonObj);
+
+  const recur = (item: StackTrace): void => {
+    const temp = {
+      id: item.id,
+      name: item.name,
+      self: item.self,
+      total: item.total,
+    };
+    data.push(temp as TableChartSample);
+
+    for (const child of item.children || []) {
+      recur(child);
+    }
+  };
+
+  // check is structuredJson is not empty before call recur
+  if (structuredJson.id) recur(structuredJson);
   return data;
 }
 
