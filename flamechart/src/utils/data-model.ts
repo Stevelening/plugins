@@ -11,7 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export interface Sample {
+/**
+ * FlameChart datamodel
+ */
+export interface FlameChartSample {
   name: number;
   value: [
     level: number,
@@ -27,4 +30,14 @@ export interface Sample {
   itemStyle: {
     color: string;
   };
+}
+
+/**
+ * TableChart datamodel
+ */
+export interface TableChartSample {
+  id: number;
+  name: string;
+  self: number;
+  total: number;
 }
