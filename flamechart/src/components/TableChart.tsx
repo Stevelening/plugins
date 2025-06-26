@@ -150,12 +150,7 @@ export function TableChart(props: TableChartProps): ReactElement {
     return columns;
   }, [data.metadata?.units, availableWidth, onFocus]);
 
-  const [sorting, setSorting] = useState<SortingState>([]);
-
-  const [pagination, setPagination] = useState<PaginationState | undefined>({
-    pageIndex: 0,
-    pageSize: availableHeight < LARGE_SCREEN_TRESHOLD ? 10 : 25,
-  });
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'total', desc: true }]);
 
   return (
     <Stack
@@ -186,8 +181,6 @@ export function TableChart(props: TableChartProps): ReactElement {
         defaultColumnHeight="auto"
         sorting={sorting}
         onSortingChange={setSorting}
-        pagination={pagination}
-        onPaginationChange={setPagination}
       />
     </Stack>
   );
