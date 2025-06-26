@@ -23,6 +23,7 @@ import { formatItemValue } from '../utils/format';
 
 const LARGE_SCREEN_TRESHOLD = 600; // heigth treshold to switch to large screen mode
 const PADDING_TOP = 20; // padding top for the table
+const SCROLL_BAR_WIDTH = 15;
 
 export interface TableChartProps {
   width: number;
@@ -66,7 +67,7 @@ export function TableChart(props: TableChartProps): ReactElement {
         headerDescription: 'Function self samples',
         align: 'right',
         enableSorting: true,
-        width: (1 / 4) * availableWidth,
+        width: (1 / 4) * availableWidth - SCROLL_BAR_WIDTH,
       },
       {
         name: 'total',
