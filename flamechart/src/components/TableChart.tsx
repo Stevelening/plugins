@@ -15,7 +15,7 @@ import { ReactElement, useMemo, useState } from 'react';
 import { Stack, useTheme, Link } from '@mui/material';
 import { ProfileData } from '@perses-dev/core';
 import { Table, TableColumnConfig } from '@perses-dev/components';
-import { PaginationState, SortingState } from '@tanstack/react-table';
+import { SortingState } from '@tanstack/react-table';
 import { tableRecursionJson } from '../utils/data-transform';
 import { TableChartSample } from '../utils/data-model';
 import { ColumnSettings } from '../utils/table-model';
