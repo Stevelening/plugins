@@ -14,7 +14,14 @@
 import { ReactElement } from 'react';
 import { Stack, TextField, MenuItem, CircularProgress, useTheme } from '@mui/material';
 import { PyroscopeDatasourceSelector } from '../model';
-import { useServices } from '../utils/use-query';
+import { useServices } from '#utils/use-query';
+/**
+ * Using path mapping (#utils) instead of relative imports for better mock handling:
+ * - Production: resolves to './utils/use-query'
+ * - Storybook/Tests: resolves to './utils/use-query.mock'
+ * This is configured via the "imports" field in package.json
+ * To learn more about storybook mocking modules: https://storybook.js.org/docs/writing-stories/mocking-data-and-modules/mocking-modules
+ */
 
 export interface ServiceProps {
   datasource: PyroscopeDatasourceSelector;

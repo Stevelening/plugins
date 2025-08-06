@@ -10,7 +10,10 @@
     "build:types": "tsc --project tsconfig.build.json",
     "lint": "eslint src --ext .ts,.tsx",
     "test": "cross-env LC_ALL=C TZ=UTC jest",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test-storybook": "test-storybook"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.18.4",
@@ -18,8 +21,8 @@
     "@perses-dev/components": "0.0.0-snapshot-profile-89b306f",
     "@perses-dev/core": "0.0.0-snapshot-profile-89b306f",
     "@perses-dev/dashboards": "0.0.0-snapshot-profile-89b306f",
-    "@perses-dev/plugin-system": "0.0.0-snapshot-profile-89b306f",
-    "@perses-dev/explore": "0.0.0-snapshot-profile-89b306f"
+    "@perses-dev/explore": "0.0.0-snapshot-profile-89b306f",
+    "@perses-dev/plugin-system": "0.0.0-snapshot-profile-89b306f"
   },
   "peerDependencies": {
     "@emotion/react": "^11.7.1",
@@ -30,12 +33,12 @@
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "echarts": "5.5.0",
+    "immer": "^10.1.1",
     "lodash": "^4.17.21",
     "react": "^17.0.2 || ^18.0.0",
     "react-dom": "^17.0.2 || ^18.0.0",
-    "use-resize-observer": "^9.0.0",
     "react-hook-form": "^7.52.2",
-    "immer": "^10.1.1"
+    "use-resize-observer": "^9.0.0"
   },
   "files": [
     "lib/**/*",
@@ -72,6 +75,25 @@
           "name": "PyroscopeExplorer"
         }
       }
+    ]
+  },
+  "devDependencies": {
+    "@storybook/addon-docs": "^9.0.18",
+    "@storybook/addon-webpack5-compiler-swc": "^3.0.0",
+    "@storybook/react-webpack5": "^9.0.18",
+    "@storybook/test-runner": "^0.23.0",
+    "eslint-plugin-storybook": "^9.0.18",
+    "storybook": "^9.0.18"
+  },
+  "imports": {
+    "#utils/use-query": {
+      "storybook": "./src/utils/use-query.mock.ts",
+      "default": "./src/utils/use-query.ts"
+    },
+    "#*": [
+      "./*",
+      "./*.ts",
+      "./*.tsx"
     ]
   }
 }
